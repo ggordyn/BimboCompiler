@@ -12,8 +12,15 @@ NUMBER_VAR "NUMBER"
 STRING_VAR "TEXT"
 VARIABLE_NAME [a-zA-Z]+[0-9a-zA-Z]*
 ASSIGNMENT " IS "
-PRINT "SAY: "
+PRINTNUM "PRINT NUMBER: "
+PRINTSTRING "PRINT TEXT: "
 END "}"
+PLUS " PLUS "
+MINUS " MINUS "
+DIVIDED_BY " DIVIDED BY "
+MULTIPLICATION " TIMES "
+MODULO " MODULO "
+
 %%
 
 "BIMBO{ " return BIMBO; //program start
@@ -31,36 +38,33 @@ END "}"
 {ASSIGNMENT} return ASSIGNMENT; //value assignment
 "CREATE " return CREATE; //variable creation
 
-
+{PLUS} return PLUS;
+{MINUS} return MINUS;
+{DIVIDED_BY} return DIVIDED_BY;
+{MULTIPLICATION} return MULTIPLICATION;
+{MODULO} return MODULO;
 "TRUE" return TRUE;	//boolean values
 "FALSE" return FALSE;
 
-{PRINT} return PRINT; //printing
-
-" GREATER " return GT; //operators
-" LESSER " return LT;
-" EQUAL " return EQ;
-" NOT EQUAL " return NE;
+{PRINTNUM} return PRINTNUM; //printing
+{PRINTSTRING} return PRINTSTRING;
+" GREATER THAN " return GT; //operators
+" LESSER THAN " return LT;
+" EQUAL TO " return EQ;
+" NOT EQUAL TO " return NE;
 " OR " return OR;
 " AND " return AND;
-
+"NOT " return NOT;
 
 "IF " return IF;	//if statements
-" THEN DO " THENDO;
+" THEN DO" return THENDO;
+"ELSE" return ELSE;
 "ENDIF" return ENDIF;
 
-"REPEAT " return REPEAT;	//do while
+"REPEAT" return REPEAT;	//do while
 "UNTIL " return UNTIL;
 
 {NEWLINE} {yylineno++; return NEWLINE};
 
 . {fprintf(stderr, "Invalid operation found\n");}; 
 %%
-
-int yywrap(void){
-    return 1;
-}
-int main(void){
-    yylex();
-    return 0;
-}
