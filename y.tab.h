@@ -15,6 +15,7 @@
      ASSIGN = 267,
      IF = 268,
      NEWLINE = 269;
+     ENDIF = 270;
    };
 #endif
 /* Tokens.  */
@@ -30,7 +31,7 @@
 #define ASSIGN 267
 #define IF 268
 #define NEWLINE 269
-
+#define ENDIF 270
 
 
 
