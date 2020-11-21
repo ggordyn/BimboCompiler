@@ -8,7 +8,7 @@ NEWLINE "\n"
 INTEGER [-]?[0-9]+
 START "BIMBO"
 STRING ["][^\n\r]*[""]
-NUMBER_VAR "NUMBER"
+INTEGER_VAR "NUMBER"
 STRING_VAR "TEXT"
 VARIABLE_NAME [a-zA-Z]+[0-9a-zA-Z]*
 ASSIGNMENT " IS "
@@ -32,7 +32,7 @@ CREATE "CREATE "
 {INTEGER} {yylval.number=atoi(yytext); return INTEGER;}	
 {STRING} {yylval.string = yytext; return STRING;}	
 
-{NUMBER_VAR} return NUMBER_VAR;	//integer datatype
+{INTEGER_VAR} return INTEGER_VAR;	//integer datatype
 {STRING_VAR} return STRING_VAR;	//string datatype
 
 {ASSIGNMENT} return ASSIGNMENT; //value assignment

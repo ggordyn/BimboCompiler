@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
-int yylex();
-
+int yylex();	//avoiding warnings
+void yyerror(const char *s);
 %}
 
 %union{
@@ -45,6 +45,7 @@ int yylex();
 %token <string> STRING;
 %token <number> INTEGER;
 %token END;
+%type<string> STRING_ST
 %start START;
 
 
@@ -103,12 +104,16 @@ UNTIL_ST: UNTIL {printf("}while(");};
 
 ENDWHILE: {printf(");");};
 
-PRINT_NUM_ST: PRINTNUM VARIABLE_NAME NEW_LINE {printf("printf("%d",$2);");};
+PRINT_NUM_ST: PRINTNUM PRINTNUM_END {printf("printf(\"");};
 
-PRINT_STRING_ST: PRINTSTRING VARIABLE_NAME NEW_LINE {printf("printf("%s",$2);");}; 
-| PRINTSTRING STRING_ST NEW_LINE {printf("printf("%s",$2);");}; 
+PRINTNUM_END: VARIABLE_NAME NEW_LINE {printf("%%d\", %s);", $1);};
 
-STRING_ST: STRING{printf("%s", $1);};
+PRINT_STRING_ST: PRINTSTRING PRINTSTRING_END{printf("printf(\"");};
+
+PRINTSTRING_END: VARIABLE_NAME NEW_LINE {printf("%%s\", %s);", $1);};
+| STRING_ST NEW_LINE {printf("%%s\", %s);", $1);};
+
+STRING_ST: STRING{ $$ = $1; printf("%%s", $1);};
 
 BOOLEXP: BOOLEXP OR_ST BOOLTERM | BOOLTERM;
 
@@ -132,7 +137,7 @@ TERM: TERM MUL_ST FACTOR | TERM DIV_ST FACTOR | TERM FACTOR | FACTOR;
 
 FACTOR: VARIABLE_NAME | NUM_ST;
 
-NUM_ST: INTEGER{printf("%d", $1);};
+NUM_ST: INTEGER{printf("%%d", $1);};
 
 OR_ST: OR{printf("||");};
 
@@ -144,7 +149,7 @@ SUM_ST: PLUS{printf("+");};
 
 MINUS_ST: MINUS{printf("-");};
 
-MODULO_ST: MODULO{printf("%");};
+MODULO_ST: MODULO{printf("%%");};
 
 MUL_ST: MULTIPLICATION{printf("*");};
 
