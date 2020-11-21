@@ -9,6 +9,6 @@ END IF
 
 REPEAT:
 	num IS num MINUS 1,
-UNTIL num EQUAL TO 0,
+UNTIL num EQUAL TO 0 OR NOT num GREATER THAN 4,
 .
 	

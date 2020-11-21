@@ -3,14 +3,13 @@
 int yylex();	//avoiding warnings
 void yyerror(const char *s);
 int yydebug = 1;
+
 %}
 
 %union{
 
   char* string;
   int number;
-  int isNumber;
-  int isString;
 
 }
 %define parse.error verbose
@@ -124,11 +123,11 @@ PRINTSTRING_END: VARIABLE_NAME {printf("%%s\", %s)", $1);};
 
 STRING_ST: STRING{ printf($1);};
 
-BOOLEXP: BOOLEXP OR_ST BOOLTERM | BOOLTERM;
+BOOLEXP: BOOLEXP OR_ST BOOLTERM | BOOLTERM | NOT_ST BOOLEXP;
 
 BOOLTERM: BOOLTERM AND_ST BOOLFACT | BOOLFACT;
 
-BOOLFACT: BOOLEXP | NOT_ST BOOLEXP | BOOLEAN;
+BOOLFACT: BOOLEXP | BOOLEAN;
 
 BOOLEAN: FALSE_ST | TRUE_ST | COMPARISON;
 
