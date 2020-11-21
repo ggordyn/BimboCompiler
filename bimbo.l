@@ -42,6 +42,7 @@ UNTIL "UNTIL "
 {BIMBO} return BIMBO; //program start
 {END} return END;
 [ \t] ECHO; //ignore whitespaces
+[\n] {ECHO; yylineno++;}
 {FINALIZER} return FINALIZER;
 {VARIABLE_NAME} {yylval.string = yytext; return VARIABLE_NAME;}	//name of variable in creation
 
@@ -85,6 +86,6 @@ UNTIL "UNTIL "
 
 int yyerror(const char *msg)
 {
-    fprintf(stderr, "Parse error: %s\n", msg);
+    fprintf(stderr, "Error: %s at line %d\n", msg, yylineno);
     return 0;
 }

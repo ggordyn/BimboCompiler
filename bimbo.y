@@ -1,9 +1,14 @@
 %{
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#define MAX_VARS 100
+#define MAX_VARLENGTH 20
 int yylex();	//avoiding warnings
 void yyerror(const char *s);
 int yydebug = 1;
-
+char vars[MAX_VARS][MAX_VARLENGTH];
+int var_idx = 0;
 %}
 
 %union{
@@ -48,6 +53,7 @@ int yydebug = 1;
 %token END;
 %type<string> STRING_ST
 %type<string> VARIABLE_NAME_S
+%type<string> DECLARATION
 %start START;
 
 
@@ -64,14 +70,31 @@ INSTRUCTION: DECLARATION FINALIZER_S
 | DECLARATION ASSIGN_STRING FINALIZER_S
 | DECLARATION ASSIGN_NUM FINALIZER_S
 | VARIABLE_NAME_S ASSIGN_STRING FINALIZER_S
-| VARIABLE_NAME_S ASSIGN_NUM FINALIZER_S
+| VARIABLE_NAME_S ASSIGN_NUM FINALIZER_S 
 | PRINT_NUM_ST FINALIZER_S
 | PRINT_STRING_ST FINALIZER_S
-| ASSIGN_STRING FINALIZER_S
-| ASSIGN_NUM FINALIZER_S;
 
+DECLARATION: CREATE DATATYPE VARIABLE_NAME_S {
 
-DECLARATION: CREATE DATATYPE VARIABLE_NAME_S;
+if(strlen($3) >= MAX_VARLENGTH)
+	yyerror("Variable name too long!\n");
+else{
+	if(var_idx >= MAX_VARS){
+		yyerror("Too many variables! Try reusing the ones you have!");
+	}else{
+		for(int i = 0; i < var_idx; i++){
+			if(strcmp(vars[i], $3) == 0){
+
+				fprintf(stderr, "Error: variable %s already defined\n", $3);
+				system("rm output.c");
+				YYABORT;
+				
+			}
+		}
+		strcpy(vars[var_idx++], $3);
+	}
+}
+};
 
 ASSIGN_STRING: ASSIGNMENT_ST STRING_ST;
 
@@ -87,7 +110,7 @@ DATATYPE: STRING_VAR {printf("char *");}
 
 CONTROL: IFBLOCK | DOWHILE; 
 
-VARIABLE_NAME_S: VARIABLE_NAME {$$ = $1, printf("%s", $1);};
+VARIABLE_NAME_S: VARIABLE_NAME {$$ = $1, printf("%s", $$);};
 
 IFBLOCK: IF_STATEMENT BOOLEXP THENDO_STATEMENT STATEMENTS ENDIF_STATEMENT
 | IF_STATEMENT BOOLEXP THENDO_STATEMENT STATEMENTS ELSE_STATEMENT STATEMENTS ENDIF_STATEMENT;
