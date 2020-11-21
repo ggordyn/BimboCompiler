@@ -1,6 +1,6 @@
 %{
 	#include "y.tab.h"
-	#include <stdio.h>
+	#include <stdlib.h>
 	#include <strings.h>
 %}
 
@@ -20,7 +20,7 @@ MINUS " MINUS "
 DIVIDED_BY " DIVIDED BY "
 MULTIPLICATION " TIMES "
 MODULO " MODULO "
-
+CREATE "CREATE "
 %%
 
 "BIMBO{ " return BIMBO; //program start
@@ -29,8 +29,8 @@ MODULO " MODULO "
 
 {VARIABLE_NAME} {yylval.string = yytext; return VARIABLE_NAME;}	//name of variable in creation
 
-{INTEGER} {yyval.number=atoi(yytext); return INTEGER;}	
-{STRING} {yyval.string = yytext; return STRING}	
+{INTEGER} {yylval.number=atoi(yytext); return INTEGER;}	
+{STRING} {yylval.string = yytext; return STRING;}	
 
 {NUMBER_VAR} return NUMBER_VAR;	//integer datatype
 {STRING_VAR} return STRING_VAR;	//string datatype
@@ -64,7 +64,7 @@ MODULO " MODULO "
 "REPEAT" return REPEAT;	//do while
 "UNTIL " return UNTIL;
 
-{NEWLINE} {yylineno++; return NEWLINE};
+{NEWLINE} {yylineno++; return NEWLINE;};
 
 . {fprintf(stderr, "Invalid operation found\n");}; 
 %%

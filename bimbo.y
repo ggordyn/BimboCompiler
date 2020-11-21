@@ -4,8 +4,6 @@ int yylex();
 
 %}
 
-%define parse.lac full
-%define parse.error verbose
 %union{
 
   char* string;
@@ -38,6 +36,7 @@ int yylex();
 %token OR;
 %token AND;
 %token NOT;
+%token CREATE;
 %token NEWLINE;
 %token TEXT;
 %token PRINTNUM;
@@ -81,39 +80,35 @@ DATATYPE: STRING_VAR_ST | INTEGER_VAR_ST;
 
 STRING_VAR_ST: STRING_VAR {printf("char *");};
 
-INT_VAR_ST: INT_VAR {printf("int");};
+INTEGER_VAR_ST: INTEGER_VAR {printf("int");};
 
 CONTROL: IFBLOCK | DOWHILE; 
 
 IFBLOCK: IF_STATEMENT BOOLEXP THENDO_STATEMENT NEW_LINE STATEMENTS ENDIF_STATEMENT NEW_LINE
-| IF_STATEMENT BOOLEXP THENDO NEW_LINE STATEMENTS NEW_LINE ELSE_STATEMENT NEW_LINE STATEMENTS ENDIF NEW_LINE;
+| IF_STATEMENT BOOLEXP THENDO_STATEMENT NEW_LINE STATEMENTS NEW_LINE ELSE_STATEMENT NEW_LINE STATEMENTS ENDIF_STATEMENT NEW_LINE;
 
 IF_STATEMENT: IF {printf("if(");};
 
 THENDO_STATEMENT: THENDO {printf("){");};
 
-ENDIF_STATEMENT: ENDIF {printf("}")};
+ENDIF_STATEMENT: ENDIF { printf("}"); };
 
-ELSE_STATEMENT: ELSE {printf("}else{")};  
+ELSE_STATEMENT: ELSE {printf("}else{");};  
 
 DOWHILE: REPEAT_ST NEW_LINE STATEMENTS UNTIL_ST BOOLEXP ENDWHILE;
 
 REPEAT_ST: REPEAT {printf("do{");};
 
-UNTIL_ST: UNTIL {printf("}while(")};
+UNTIL_ST: UNTIL {printf("}while(");};
 
-ENDWHILE: {printf(");")};
+ENDWHILE: {printf(");");};
 
-PRINT_NUM_ST: PRINTNUM VARIABLE_NAME ENDPRINT {printf("printf("%d",$2);");};
+PRINT_NUM_ST: PRINTNUM VARIABLE_NAME NEW_LINE {printf("printf("%d",$2);");};
 
-PRINT_STRING_ST: PRINTSTRING VARIABLE_NAME ENDPRINT {printf("printf("%s",$2);");}; 
-| PRINTSTRING STRING_ST ENDPRINT {printf("printf("%s",$2);");}; 
+PRINT_STRING_ST: PRINTSTRING VARIABLE_NAME NEW_LINE {printf("printf("%s",$2);");}; 
+| PRINTSTRING STRING_ST NEW_LINE {printf("printf("%s",$2);");}; 
 
 STRING_ST: STRING{printf("%s", $1);};
-
-ENDPRINT_NUM: {printf("")}
-
-ENDPRINT: {printf(");");};
 
 BOOLEXP: BOOLEXP OR_ST BOOLTERM | BOOLTERM;
 
@@ -139,7 +134,7 @@ FACTOR: VARIABLE_NAME | NUM_ST;
 
 NUM_ST: INTEGER{printf("%d", $1);};
 
-OR_ST: OR{printf("||");}:
+OR_ST: OR{printf("||");};
 
 AND_ST: AND{printf("&&");};
 
@@ -163,7 +158,6 @@ EQ_ST: EQ{printf("==");};
 
 NE_ST: NE{printf("!=");};
 
-PRINT_OP: PRINT{printf("printf(");};
 
 
 %%
@@ -173,6 +167,6 @@ int yywrap()
         return 1;
 } 
 
-main() {
+int main(void) {
     yyparse();
 } 
