@@ -1,0 +1,16 @@
+BIMBO:
+	CREATE TEXT helloWorld IS "Hello world!\n", 
+	CREATE NUMBER num,
+	PRINT TEXT: helloWorld,
+	PRINT TEXT: "This is an example program written in Bimbo!\n",
+	PRINT TEXT: "Write some text to be printed: \n",
+	READ TEXT INTO: helloWorld,
+	PRINT TEXT: "Now write a number: \n",
+	READ NUMBER INTO: num,
+	PRINT TEXT: "Your text is: ",
+	PRINT TEXT: helloWorld,
+	PRINT TEXT: " and your number is: ",
+	PRINT NUMBER: num,
+	PRINT TEXT: "\n",
+.
+	

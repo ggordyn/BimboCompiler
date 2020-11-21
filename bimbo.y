@@ -51,6 +51,8 @@ int var_idx = 0;
 %token <string> STRING;
 %token <number> INTEGER;
 %token END;
+%token READ;
+%token INTO;
 %type<string> STRING_ST
 %type<string> VARIABLE_NAME_S
 %type<string> DECLARATION
@@ -73,6 +75,10 @@ INSTRUCTION: DECLARATION FINALIZER_S
 | VARIABLE_NAME_S ASSIGN_NUM FINALIZER_S 
 | PRINT_NUM_ST FINALIZER_S
 | PRINT_STRING_ST FINALIZER_S
+| READ STRING_VAR INTO VARIABLE_NAME FINALIZER {printf("scanf(\"%%s\", %s\b);", $4);}
+| READ INTEGER_VAR INTO VARIABLE_NAME FINALIZER {printf("scanf(\"%%s\", &%s\b);", $4);}
+
+
 
 DECLARATION: CREATE DATATYPE VARIABLE_NAME_S {
 
@@ -141,7 +147,7 @@ PRINT_STRING_ST: PRINTSTRING_S PRINTSTRING_END;
 
 PRINTSTRING_S: PRINTSTRING {printf("printf(");}
 
-PRINTSTRING_END: VARIABLE_NAME {printf("%%s\", %s)", $1);};
+PRINTSTRING_END: VARIABLE_NAME {printf("\"%%s\", %s)", $1);};
 | STRING_ST {printf(")");};
 
 STRING_ST: STRING{ printf($1);};

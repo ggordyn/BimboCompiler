@@ -1,0 +1,15 @@
+BIMBO:
+	CREATE NUMBER num,
+	PRINT TEXT: "Type a number: \n",
+	READ NUMBER INTO: num,
+	PRINT TEXT: "Your number's first 10 multiples are: ",
+	CREATE NUMBER count IS 1,
+	CREATE NUMBER multiple,
+	REPEAT:
+		multiple IS num TIMES count,
+		PRINT NUMBER: multiple,
+		PRINT TEXT: " ",
+		count IS count PLUS 1,
+	UNTIL count LESSER THAN 11,
+	PRINT TEXT: "\n",
+.

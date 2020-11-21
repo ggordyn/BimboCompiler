@@ -10,7 +10,7 @@ BIMBO "BIMBO:"
 STRING ["][^\n\r]*["]
 INTEGER_VAR "NUMBER "
 STRING_VAR "TEXT "
-VARIABLE_NAME [a-zA-Z]+[0-9a-zA-Z]*
+VARIABLE_NAME [a-zA-Z]+[_0-9a-zA-Z]*
 ASSIGNMENT " IS "
 PRINTNUM "PRINT NUMBER: "
 PRINTSTRING "PRINT TEXT: "
@@ -36,7 +36,8 @@ ELSE "ELSE:"
 ENDIF "END IF"
 REPEAT "REPEAT:"
 UNTIL "UNTIL "
-
+READ "READ "
+INTO "INTO: "
 %%
 
 {BIMBO} return BIMBO; //program start
@@ -44,6 +45,8 @@ UNTIL "UNTIL "
 [ \t] ECHO; //ignore whitespaces
 [\n] {ECHO; yylineno++;}
 {FINALIZER} return FINALIZER;
+{READ} return READ;
+{INTO} return INTO;
 {VARIABLE_NAME} {yylval.string = yytext; return VARIABLE_NAME;}	//name of variable in creation
 
 {INTEGER} {yylval.number=atoi(yytext); return INTEGER;}	
