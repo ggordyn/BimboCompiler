@@ -4,7 +4,7 @@
 	#include <strings.h>
 %}
 
-FINALIZER ";"
+FINALIZER ","
 INTEGER [-]?[0-9]+
 BIMBO "BIMBO:"
 STRING ["][^\n\r]*["]
@@ -31,10 +31,10 @@ OR " OR "
 AND " AND "
 NOT "NOT "
 IF "IF "
-THENDO " THEN DO"
-ELSE "ELSE"
-ENDIF "ENDIF"
-REPEAT "REPEAT"
+THENDO " THEN DO:"
+ELSE "ELSE:"
+ENDIF "END IF"
+REPEAT "REPEAT:"
 UNTIL "UNTIL "
 
 %%

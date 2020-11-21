@@ -1,8 +1,14 @@
 BIMBO:
-CREATE NUMBER num IS 5;
-CREATE TEXT ok IS "todo ok?";
-PRINT TEXT: "su numero es:";
-PRINT NUMBER: num;
-PRINT TEXT: ok;
+
+CREATE NUMBER num IS 3,
+IF num EQUAL TO 3 THEN DO: 
+	PRINT TEXT: "num is 3",
+ELSE:
+	PRINT TEXT: "num isnt 3",
+END IF
+
+REPEAT:
+	num IS num MINUS 1,
+UNTIL num EQUAL TO 0,
 .
 	

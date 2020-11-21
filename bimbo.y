@@ -107,7 +107,7 @@ REPEAT_ST: REPEAT {printf("do{");};
 
 UNTIL_ST: UNTIL {printf("}while(");};
 
-ENDWHILE: {printf(");");};
+ENDWHILE: FINALIZER {printf(");");};
 
 PRINT_NUM_ST: PRINTNUM_S PRINTNUM_END;
 
