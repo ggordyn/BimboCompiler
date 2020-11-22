@@ -89,6 +89,6 @@ INTO "INTO: "
 
 int yyerror(const char *msg)
 {
-    fprintf(stderr, "Error: %s at line %d\n", msg, yylineno);
+    fprintf(stderr, "ERROR: %s at line %d\n", msg, yylineno);
     return 0;
 }

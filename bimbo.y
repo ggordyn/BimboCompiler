@@ -55,6 +55,8 @@ int var_idx = 0;
 %token INTO;
 %type<string> STRING_ST
 %type<string> VARIABLE_NAME_S
+%type<string> VARIABLE_NAME_F
+%type<string> VARIABLE_NAME_CHECK
 %type<string> DECLARATION
 %start START;
 
@@ -71,27 +73,61 @@ STATEMENTS: INSTRUCTION STATEMENTS | CONTROL STATEMENTS | {};
 INSTRUCTION: DECLARATION FINALIZER_S 
 | DECLARATION ASSIGN_STRING FINALIZER_S
 | DECLARATION ASSIGN_NUM FINALIZER_S
-| VARIABLE_NAME_S ASSIGN_STRING FINALIZER_S
-| VARIABLE_NAME_S ASSIGN_NUM FINALIZER_S 
+| VARIABLE_NAME_F ASSIGN_STRING FINALIZER_S
+| VARIABLE_NAME_F ASSIGN_NUM FINALIZER_S 
 | PRINT_NUM_ST FINALIZER_S
 | PRINT_STRING_ST FINALIZER_S
-| READ STRING_VAR INTO VARIABLE_NAME FINALIZER {printf("scanf(\"%%s\", %s\b);", $4);}
-| READ INTEGER_VAR INTO VARIABLE_NAME FINALIZER {printf("scanf(\"%%s\", &%s\b);", $4);}
+| READ STRING_VAR INTO VARIABLE_NAME_CHECK FINALIZER {printf("scanf(\"%%s\", %s\b);", $4);}
+| READ INTEGER_VAR INTO VARIABLE_NAME_CHECK FINALIZER {printf("scanf(\"%%s\", &%s\b);", $4);}
 
+VARIABLE_NAME_CHECK: VARIABLE_NAME {
+	int found = 0;
+	for(int i = 0; i <= var_idx; i++){
+		if(strcmp(vars[i], $1) == 0){
+			found = 1;
+		}
+	}
+	if(!found){
+		yyerror("undefined variable");
+		fprintf(stderr, "Be careful! Variable '%s' does not exist!\n", $1);
+		
+		system("rm output.c");
+		YYABORT;
+	}
+};
+VARIABLE_NAME_F: VARIABLE_NAME {
+	int found = 0;
+	for(int i = 0; i <= var_idx; i++){
+		if(strcmp(vars[i], $1) == 0){
+			found = 1;
+		}
+	}
+	if(found)
+		printf("%s", $1);
+	else{
+		yyerror("undefined variable");
+		fprintf(stderr, "Be careful! Variable '%s' does not exist!\n", $1);
+		
+		system("rm output.c");
+		YYABORT;
+	}
+};
 
 
 DECLARATION: CREATE DATATYPE VARIABLE_NAME_S {
 
-if(strlen($3) >= MAX_VARLENGTH)
-	yyerror("Variable name too long!\n");
+if(strlen($3) >= MAX_VARLENGTH){
+	fprintf(stderr, "Be careful! Variable name '%s' is way too long!\n", $3);
+	yyerror("Symbol table error");
+}
 else{
 	if(var_idx >= MAX_VARS){
 		yyerror("Too many variables! Try reusing the ones you have!");
 	}else{
 		for(int i = 0; i < var_idx; i++){
 			if(strcmp(vars[i], $3) == 0){
-
-				fprintf(stderr, "Error: variable %s already defined\n", $3);
+				yyerror("re-definition of variable");
+				fprintf(stderr, "Be careful! Variable '%s' was already defined\n", $3);
 				system("rm output.c");
 				YYABORT;
 				
@@ -172,7 +208,7 @@ EXP: EXP SUM_ST TERM | EXP MINUS_ST TERM | EXP MODULO_ST TERM | TERM;
 
 TERM: TERM MUL_ST FACTOR | TERM DIV_ST FACTOR | TERM FACTOR | FACTOR;
 
-FACTOR: VARIABLE_NAME_S | NUM_ST;
+FACTOR: VARIABLE_NAME_F | NUM_ST;
 
 NUM_ST: INTEGER{printf("%d", $1);};
 
