@@ -1,5 +1,5 @@
 struct node {
-    char data[20];
+    char data[30];
     struct node *next;
 };
 

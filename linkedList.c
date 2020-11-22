@@ -50,7 +50,6 @@ int llist_add_inorder(char * name, llist *list)
 
     new_node = (struct node *)malloc(sizeof (struct node));
     strcpy(new_node->data, name);
-
     // Find spot in linked list to insert new node
     while (curr != NULL && curr->data != NULL && strcmp(curr->data, name) < 0) {
         prev = curr;
@@ -77,4 +76,4 @@ int llist_search(llist *list, char * name)
         current = current->next; 
     } 
     return 0; 
-} 
+}

@@ -38,6 +38,8 @@ REPEAT "REPEAT:"
 UNTIL "UNTIL "
 READ "READ "
 INTO "INTO: "
+INTO_SP " INTO: "
+MAXLENGTH "OF MAX LENGTH "
 %%
 
 {BIMBO} return BIMBO; //program start
@@ -47,6 +49,8 @@ INTO "INTO: "
 {FINALIZER} return FINALIZER;
 {READ} return READ;
 {INTO} return INTO;
+{INTO_SP} return INTO_SP;
+{MAXLENGTH} return MAXLENGTH;
 {VARIABLE_NAME} {yylval.string = yytext; return VARIABLE_NAME;}	//name of variable in creation
 
 {INTEGER} {yylval.number=atoi(yytext); return INTEGER;}	

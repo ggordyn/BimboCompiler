@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "linkedList.h"
-#define MAX_VARLENGTH 20
+#define MAX_VARLENGTH 30
 
 
 int yylex();	//avoiding warnings
@@ -18,6 +18,7 @@ llist * symbol_table;
   int number;
 
 }
+
 %define parse.error verbose
 %token BIMBO; 
 %token ASSIGNMENT; 
@@ -48,11 +49,13 @@ llist * symbol_table;
 %token TEXT;
 %token PRINTNUM;
 %token PRINTSTRING;
+%token MAXLENGTH;
 %token <string> VARIABLE_NAME;
 %token <string> STRING;
 %token <number> INTEGER;
 %token END;
 %token READ;
+%token INTO_SP;
 %token INTO;
 %type<string> STRING_ST
 %type<string> VARIABLE_NAME_S
@@ -78,8 +81,9 @@ INSTRUCTION: DECLARATION FINALIZER_S
 | VARIABLE_NAME_F ASSIGN_NUM FINALIZER_S 
 | PRINT_NUM_ST FINALIZER_S
 | PRINT_STRING_ST FINALIZER_S
-| READ STRING_VAR INTO VARIABLE_NAME_CHECK FINALIZER {printf("scanf(\"%%s\", %s\b);", $4);}
+| READ STRING_VAR MAXLENGTH INTEGER INTO_SP VARIABLE_NAME_CHECK FINALIZER {printf("%s\b = malloc(%d);", $6, $4 + 1);printf("scanf(\"%%s\", %s\b);", $6);}
 | READ INTEGER_VAR INTO VARIABLE_NAME_CHECK FINALIZER {printf("scanf(\"%%s\", &%s\b);", $4);}
+
 
 VARIABLE_NAME_CHECK: VARIABLE_NAME {
 	int found = 0;

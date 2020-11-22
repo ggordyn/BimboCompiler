@@ -4,7 +4,7 @@ BIMBO:
 	PRINT TEXT: helloWorld,
 	PRINT TEXT: "This is an example program written in Bimbo!\n",
 	PRINT TEXT: "Write some text to be printed: \n",
-	READ TEXT INTO: helloWorld,
+	READ TEXT OF MAX LENGTH 20 INTO: helloWorld,
 	PRINT TEXT: "Now write a number: \n",
 	READ NUMBER INTO: num,
 	PRINT TEXT: "Your text is: ",
