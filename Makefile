@@ -7,7 +7,7 @@ PARSER_RESULT = bimbo.out
 all:
 	yacc -d $(PARSER)
 	lex $(SCANNER)
-	gcc -o bimbo.out lex.yy.c y.tab.c -ly
+	gcc -o bimbo.out lex.yy.c y.tab.c linkedList.c -ly
 	@echo "BIMBO COMILATION DONE"
 
 clean:

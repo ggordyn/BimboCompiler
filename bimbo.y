@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#define MAX_VARS 100
+#include "linkedList.h"
 #define MAX_VARLENGTH 20
+
+
 int yylex();	//avoiding warnings
 void yyerror(const char *s);
 int yydebug = 1;
-char vars[MAX_VARS][MAX_VARLENGTH];
-int var_idx = 0;
+llist * symbol_table;
 %}
 
 %union{
@@ -82,10 +83,8 @@ INSTRUCTION: DECLARATION FINALIZER_S
 
 VARIABLE_NAME_CHECK: VARIABLE_NAME {
 	int found = 0;
-	for(int i = 0; i <= var_idx; i++){
-		if(strcmp(vars[i], $1) == 0){
-			found = 1;
-		}
+	if(llist_search(symbol_table, $1)){
+		found = 1;
 	}
 	if(!found){
 		yyerror("undefined variable");
@@ -97,10 +96,8 @@ VARIABLE_NAME_CHECK: VARIABLE_NAME {
 };
 VARIABLE_NAME_F: VARIABLE_NAME {
 	int found = 0;
-	for(int i = 0; i <= var_idx; i++){
-		if(strcmp(vars[i], $1) == 0){
-			found = 1;
-		}
+	if(llist_search(symbol_table, $1)){
+		found = 1;
 	}
 	if(found)
 		printf("%s", $1);
@@ -121,21 +118,16 @@ if(strlen($3) >= MAX_VARLENGTH){
 	yyerror("Symbol table error");
 }
 else{
-	if(var_idx >= MAX_VARS){
-		yyerror("Too many variables! Try reusing the ones you have!");
-	}else{
-		for(int i = 0; i < var_idx; i++){
-			if(strcmp(vars[i], $3) == 0){
-				yyerror("re-definition of variable");
-				fprintf(stderr, "Be careful! Variable '%s' was already defined\n", $3);
-				system("rm output.c");
-				YYABORT;
-				
-			}
-		}
-		strcpy(vars[var_idx++], $3);
+	if(llist_search(symbol_table, $3)){
+		yyerror("re-definition of variable");
+		fprintf(stderr, "Be careful! Variable '%s' was already defined\n", $3);
+		system("rm output.c");
+		YYABORT;	
 	}
+	else
+		llist_add_inorder($3, symbol_table);
 }
+
 };
 
 ASSIGN_STRING: ASSIGNMENT_ST STRING_ST;
@@ -246,5 +238,7 @@ int yywrap()
 } 
 
 int main(void) {
+	symbol_table = llist_create("");
     yyparse();
+    free(symbol_table);
 } 
