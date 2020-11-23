@@ -12,6 +12,8 @@ int yydebug = 1;
 llist * symbol_table;
 char typeaux[10];
 char typeout[10];
+char aux[50];
+char * tok;
 %}
 
 %union{
@@ -59,10 +61,25 @@ char typeout[10];
 %token READ;
 %token INTO_SP;
 %token INTO;
+%token TEXTLIST;
+%token ADD;
+%token TOSTRINGLIST;
+%token REMOVE;
+%token FROMSTRINGLIST;
+%token PRINTTEXTLIST;
+%token TONUMBERLIST;
+%token FROMNUMBERLIST;
+%token NUMBERLIST;
+%token STARTON;
+%token SPACE;
 %type<string> STRING_ST
 %type<string> VARIABLE_NAME_S
 %type<string> VARIABLE_NAME_F
 %type<string> VARIABLE_NAME_CHECK
+%type<string> VARIABLE_NAME_LIST
+%type<string> VARIABLE_NAME_INTLIST
+%type<string> VARIABLE_NAME_CHECKTEXTLIST
+%type<string> VARIABLE_NAME_CHECKNUMBERLIST
 %type<string> DATATYPE
 %type<string> DECLARATION
 %start START;
@@ -71,7 +88,7 @@ char typeout[10];
 %%
 START: BEGIN STATEMENTS FINISH;
 
-BEGIN: BIMBO {printf("int main (){");};
+BEGIN: BIMBO {printf("#include \"linkedList.h\"\n#include \"integerLinkedList.h\"\n");printf("int main (){");};
 FINISH: END {printf("}");};
 
 
@@ -86,6 +103,47 @@ INSTRUCTION: DECLARATION FINALIZER_S
 | PRINT_STRING_ST FINALIZER_S
 | READ STRING_VAR MAXLENGTH INTEGER INTO_SP VARIABLE_NAME_CHECK FINALIZER {printf("%s\b = malloc(%d);", $6, $4 + 1);printf("scanf(\"%%s\", %s\b);", $6);}
 | READ INTEGER_VAR INTO VARIABLE_NAME_CHECK FINALIZER {printf("scanf(\"%%d\", &%s\b);", $4);}
+| ADD STRING TOSTRINGLIST VARIABLE_NAME_CHECKTEXTLIST FINALIZER{
+	strcpy(aux, $2);
+	tok = strtok(aux, " ");
+	printf("llist_add_inorder(%s, %s\b, \"\");", tok, $4);
+}
+| ADD VARIABLE_NAME_CHECK TOSTRINGLIST VARIABLE_NAME_CHECKTEXTLIST FINALIZER{
+	strcpy(aux, $2);
+	tok = strtok(aux, " ");
+	printf("llist_add_inorder(%s, %s\b, \"\");", tok, $4);
+}
+| REMOVE STRING FROMSTRINGLIST VARIABLE_NAME_CHECKTEXTLIST FINALIZER{
+	strcpy(aux, $2);
+	tok = strtok(aux, " ");
+	printf("llist_remove(%s, %s\b);", tok, $4);
+}
+| REMOVE VARIABLE_NAME_CHECK FROMSTRINGLIST VARIABLE_NAME_CHECKTEXTLIST FINALIZER{
+	strcpy(aux, $2);
+	tok = strtok(aux, " ");
+	printf("llist_remove(%s, %s\b);", tok, $4);
+}
+
+| PRINTTEXTLIST VARIABLE_NAME_CHECKTEXTLIST FINALIZER{
+	printf("llist_print(%s);", $2);
+}
+| ADD INTEGER TONUMBERLIST VARIABLE_NAME_CHECKNUMBERLIST FINALIZER{
+	
+	printf("intllist_add_inorder(%d, %s\b);", $2, $4);
+}
+| ADD VARIABLE_NAME_CHECK TONUMBERLIST VARIABLE_NAME_CHECKNUMBERLIST FINALIZER{
+	strcpy(aux, $2);
+	tok = strtok(aux, " ");
+	printf("intllist_add_inorder(%s, %s\b);", tok, $4);
+}
+| REMOVE INTEGER FROMNUMBERLIST VARIABLE_NAME_CHECKNUMBERLIST FINALIZER{
+	printf("intllist_remove(%d, %s\b);", $2, $4);
+}
+| REMOVE VARIABLE_NAME_CHECK FROMNUMBERLIST VARIABLE_NAME_CHECKNUMBERLIST FINALIZER{
+	strcpy(aux, $2);
+	tok = strtok(aux, " ");
+	printf("intllist_remove(%s, %s\b);", tok, $4);
+}
 
 
 VARIABLE_NAME_CHECK: VARIABLE_NAME {
@@ -101,6 +159,43 @@ VARIABLE_NAME_CHECK: VARIABLE_NAME {
 		YYABORT;
 	}
 };
+
+VARIABLE_NAME_CHECKTEXTLIST: VARIABLE_NAME {
+	int found = 0;
+	if(llist_search(symbol_table, $1, typeout)){
+		found = 1;
+	}
+	if(!found){
+		yyerror("undefined variable");
+		fprintf(stderr, "Be careful! Variable '%s' does not exist!\n", $1);
+		
+		system("rm output.c");
+		YYABORT;
+	}else if(strcmp(typeout, "TEXTLIST") != 0){
+		yyerror("Invalid list");
+		fprintf(stderr, "Be careful! Variable '%s' is not a text list!\n", $1);
+		system("rm output.c");
+		YYABORT;
+	}
+}
+VARIABLE_NAME_CHECKNUMBERLIST: VARIABLE_NAME {
+	int found = 0;
+	if(llist_search(symbol_table, $1, typeout)){
+		found = 1;
+	}
+	if(!found){
+		yyerror("undefined variable");
+		fprintf(stderr, "Be careful! Variable '%s' does not exist!\n", $1);
+		
+		system("rm output.c");
+		YYABORT;
+	}else if(strcmp(typeout, "INTLIST") != 0){
+		yyerror("Invalid list");
+		fprintf(stderr, "Be careful! Variable '%s' is not a number list!\n", $1);
+		system("rm output.c");
+		YYABORT;
+	}
+}
 VARIABLE_NAME_F: VARIABLE_NAME {
 	int found = 0;
 	if(llist_search(symbol_table, $1, typeout)){
@@ -137,6 +232,66 @@ else{
 	}
 }
 $$ = $3;
+}
+|CREATE TEXTLIST VARIABLE_NAME_LIST{
+	if(strlen($3) >= MAX_VARLENGTH){
+	fprintf(stderr, "Be careful! Variable name '%s' is way too long!\n", $3);
+	yyerror("Symbol table error");
+}
+else{
+	if(llist_search(symbol_table, $3, typeout)){
+		yyerror("re-definition of variable");
+		fprintf(stderr, "Be careful! Variable '%s' was already defined\n", $3);
+		system("rm output.c");
+		YYABORT;	
+	}
+	else{
+		strcpy(typeaux, "TEXTLIST");
+		llist_add_inorder($3, symbol_table, typeaux);
+	}
+}
+printf("=llist_create(NULL)");
+}
+|CREATE NUMBERLIST VARIABLE_NAME_INTLIST STARTON INTEGER{
+	if(strlen($3) >= MAX_VARLENGTH){
+	fprintf(stderr, "Be careful! Variable name '%s' is way too long!\n", $3);
+	yyerror("Symbol table error");
+}
+else{
+	if(llist_search(symbol_table, $3, typeout)){
+		yyerror("re-definition of variable");
+		fprintf(stderr, "Be careful! Variable '%s' was already defined\n", $3);
+		system("rm output.c");
+		YYABORT;	
+	}
+	else{
+		strcpy(typeaux, "INTLIST");
+		strcpy(aux, $3);
+		strtok(aux, " ");
+		llist_add_inorder(aux, symbol_table, typeaux);
+	}
+	printf("=intllist_create(%d)", $5);
+}
+}|CREATE NUMBERLIST VARIABLE_NAME_INTLIST STARTON VARIABLE_NAME_CHECK{
+	if(strlen($3) >= MAX_VARLENGTH){
+	fprintf(stderr, "Be careful! Variable name '%s' is way too long!\n", $3);
+	yyerror("Symbol table error");
+}
+else{
+	if(llist_search(symbol_table, $3, typeout)){
+		yyerror("re-definition of variable");
+		fprintf(stderr, "Be careful! Variable '%s' was already defined\n", $3);
+		system("rm output.c");
+		YYABORT;	
+	}
+	else{
+		strcpy(typeaux, "INTLIST");
+		strcpy(aux, $3);
+		strtok(aux, " ");
+		llist_add_inorder(aux, symbol_table, typeaux);
+	}
+	printf("=intllist_create(%s)", $5);
+}
 };
 
 ASSIGN_STRING: ASSIGNMENT_ST STRING_ST;
@@ -154,6 +309,10 @@ DATATYPE: STRING_VAR {$$ = "TEXT"; printf("char *");}
 CONTROL: IFBLOCK | DOWHILE; 
 
 VARIABLE_NAME_S: VARIABLE_NAME {$$ = $1, printf("%s", $$);};
+
+VARIABLE_NAME_LIST: VARIABLE_NAME {$$ = $1, printf("llist * %s", $$);};
+VARIABLE_NAME_INTLIST: VARIABLE_NAME {$$ = $1, printf("intllist * %s", $$);};
+
 
 IFBLOCK: IF_STATEMENT BOOLEXP THENDO_STATEMENT STATEMENTS ENDIF_STATEMENT
 | IF_STATEMENT BOOLEXP THENDO_STATEMENT STATEMENTS ELSE_STATEMENT STATEMENTS ENDIF_STATEMENT;

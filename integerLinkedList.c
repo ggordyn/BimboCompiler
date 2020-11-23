@@ -1,23 +1,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "linkedList.h"
+#include "integerLinkedList.h"
 
-llist *llist_create(char * name)
+intllist *intllist_create(int num)
 {
     struct node *new_node;
 
-    llist *new_list = (llist *)malloc(sizeof (llist));
+    intllist *new_list = (intllist *)malloc(sizeof (intllist));
     *new_list = (struct node *)malloc(sizeof (struct node));
     
     new_node = *new_list;
-    strcpy(new_node->data, name);
-    strcpy(new_node->type, "");
+    new_node->num = num;
     new_node->next = NULL;
     return new_list;
 }
 
-void llist_free(llist *list)
+void intllist_free(intllist *list)
 {
     struct node *curr = *list;
     struct node *next;
@@ -32,7 +31,7 @@ void llist_free(llist *list)
 }
 
 // Returns 0 on failure
-int llist_add_inorder(char * name, llist *list, char * type)
+int intllist_add_inorder(int num, intllist *list)
 {
     struct node *new_node;
     struct node *curr;
@@ -43,17 +42,11 @@ int llist_add_inorder(char * name, llist *list, char * type)
     }
     
     curr = *list;
-    if (curr->data == NULL) {
-        strcpy(curr->data, name);
-        strcpy(curr->type, type);
-        return 1;
-    }
 
     new_node = (struct node *)malloc(sizeof (struct node));
-    strcpy(new_node->data, name);
-    strcpy(new_node->type, type);
+    new_node->num = num;
     // Find spot in linked list to insert new node
-    while (curr != NULL && curr->data != NULL && strcmp(curr->data, name) < 0) {
+    while (curr != NULL && curr->num < num) {
         prev = curr;
         curr = curr->next;
     }
@@ -67,13 +60,12 @@ int llist_add_inorder(char * name, llist *list, char * type)
 }
 
 
-int llist_search(llist *list, char * name, char * auxtype) 
+int intllist_search(intllist *list, int num) 
 { 
     struct node* current = *list;  // Initialize current 
     while (current != NULL) 
     { 
-        if (strcmp(current->data, name) == 0){
-            strcpy(auxtype, current->type);
+        if (current->num == num){
             return 1;
         } 
         current = current->next; 
@@ -81,9 +73,9 @@ int llist_search(llist *list, char * name, char * auxtype)
     return 0; 
 }
 
-void llist_remove(llist *list, char * name){
+void intllist_remove(intllist *list, int num){
     struct node * current = *list;
-    if(strcmp(current->data, name) == 0){
+    if(current->num == num){
         if(current->next == NULL){
             printf("You can't delete the last element of a list!");
         }else{
@@ -94,7 +86,7 @@ void llist_remove(llist *list, char * name){
         struct node * prev = current;
         current = current->next;
         while(current != NULL){
-            if(strcmp(current->data, name) == 0){
+            if(current->num == num){
                 if(current->next != NULL){
                     prev->next = current->next;
                     free(current);
@@ -111,13 +103,13 @@ void llist_remove(llist *list, char * name){
     }
 }
 
-int llist_print(llist *list) 
+int intllist_print(intllist *list) 
 { 
     struct node* current = *list;  // Initialize current
     while (current != NULL) 
     { 
         
-        printf("%s \n", current->data);
+        printf("%d \n", current->num);
         current = current->next;
     } 
     return 0; 
