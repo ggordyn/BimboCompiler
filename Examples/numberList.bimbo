@@ -1,0 +1,48 @@
+BIMBO:
+	
+	CREATE NUMBER num,
+
+	PRINT TEXT: "Let's make a sorted number list!\n",
+	PRINT TEXT: "I will add 5 to our list!\n",
+	CREATE NUMBER LIST mylist STARTING ON 5,
+
+	PRINT TEXT: "Here's our number list up to now:\nNUMBER LIST\n------------------------\n",
+	PRINT NUMBER LIST: mylist,
+
+	PRINT TEXT: "\nType another number to add: \n",
+	READ NUMBER INTO: num,
+
+	PRINT TEXT: "Let's add it to our list!\n",
+	ADD num TO NUMBER LIST mylist,
+	PRINT TEXT: "NUMBER LIST\n------------------------\n",
+	PRINT NUMBER LIST: mylist,
+
+	PRINT TEXT: "\nNow I'll add 8! \n",
+	ADD 8 TO NUMBER LIST mylist,
+	PRINT TEXT: "NUMBER LIST\n------------------------\n",
+	PRINT NUMBER LIST: mylist,
+
+	PRINT TEXT: "\nType another number to add: \n",
+	READ NUMBER INTO: num,
+
+
+	PRINT TEXT: "Let's add it to our list!\n",
+	ADD num TO NUMBER LIST mylist,
+	PRINT TEXT: "NUMBER LIST\n------------------------\n",
+	PRINT NUMBER LIST: mylist,
+
+	PRINT TEXT: "\nI don't want your last addition anymore! I'll remove it from the list.\n",
+	REMOVE num FROM NUMBER LIST mylist,
+
+	PRINT TEXT: "NUMBER LIST\n------------------------\n",
+	PRINT NUMBER LIST: mylist,
+
+	PRINT TEXT: "\nChoose a number to remove:\n",
+	READ NUMBER INTO: num,
+	REMOVE num FROM NUMBER LIST mylist,
+
+	PRINT TEXT: "\nThis is our finished list: \n",
+
+	PRINT TEXT: "NUMBER LIST\n------------------------\n",
+	PRINT NUMBER LIST: mylist,
+.

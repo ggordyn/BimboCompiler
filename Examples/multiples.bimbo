@@ -10,6 +10,6 @@ BIMBO:
 		PRINT NUMBER: multiple,
 		PRINT TEXT: " ",
 		count IS count PLUS 1,
-	UNTIL count LESSER THAN 11,
+	WHILE count LESSER THAN 11,
 	PRINT TEXT: "\n",
 .

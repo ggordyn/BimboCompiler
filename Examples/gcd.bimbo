@@ -1,0 +1,26 @@
+BIMBO:
+	CREATE NUMBER num1,
+	CREATE NUMBER num2,
+	PRINT TEXT: "Let's find the Greatest Common Divisor between two numbers!\n",
+	PRINT TEXT: "Input your first number:\n",
+	READ NUMBER INTO: num1,
+	IF num1 LESSER THAN 0 THEN DO:
+		num1 IS num1 TIMES -1,
+	END IF
+	
+	PRINT TEXT: "Input your second number:\n",
+	READ NUMBER INTO: num2,
+	IF num2 LESSER THAN 0 THEN DO:
+		num2 IS num2 TIMES -1,
+	END IF
+
+	REPEAT:
+		CREATE NUMBER aux IS num1,
+		num1 IS num2,
+		num2 IS aux MODULO num2,
+	WHILE num2 NOT EQUAL TO 0,
+
+	PRINT TEXT: "The GCD is: ",
+	PRINT NUMBER: num1,
+	PRINT TEXT: "\n",
+.

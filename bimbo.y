@@ -8,11 +8,11 @@
 
 int yylex();	//avoiding warnings
 void yyerror(const char *s);
-int yydebug = 1;
 llist * symbol_table;
 char typeaux[10];
 char typeout[10];
 char aux[50];
+char auxtok[50];
 char * tok;
 %}
 
@@ -23,7 +23,6 @@ char * tok;
 
 }
 
-%define parse.error verbose
 %token BIMBO; 
 %token ASSIGNMENT; 
 %token STRING_VAR;
@@ -36,7 +35,7 @@ char * tok;
 %token TRUE; 
 %token FALSE; 
 %token REPEAT; 
-%token UNTIL; 
+%token WHILE; 
 %token IF;
 %token THENDO;
 %token ELSE;
@@ -67,6 +66,7 @@ char * tok;
 %token REMOVE;
 %token FROMSTRINGLIST;
 %token PRINTTEXTLIST;
+%token PRINTNUMBERLIST;
 %token TONUMBERLIST;
 %token FROMNUMBERLIST;
 %token NUMBERLIST;
@@ -88,7 +88,7 @@ char * tok;
 %%
 START: BEGIN STATEMENTS FINISH;
 
-BEGIN: BIMBO {printf("#include \"linkedList.h\"\n#include \"integerLinkedList.h\"\n");printf("int main (){");};
+BEGIN: BIMBO {printf("#include <strings.h>\n#include <stdio.h>\n#include <stdlib.h>\n#include \"linkedList.h\"\n#include \"integerLinkedList.h\"\n");printf("int main (){");};
 FINISH: END {printf("}");};
 
 
@@ -101,48 +101,76 @@ INSTRUCTION: DECLARATION FINALIZER_S
 | VARIABLE_NAME_F ASSIGN_NUM FINALIZER_S 
 | PRINT_NUM_ST FINALIZER_S
 | PRINT_STRING_ST FINALIZER_S
-| READ STRING_VAR MAXLENGTH INTEGER INTO_SP VARIABLE_NAME_CHECK FINALIZER {printf("%s\b = malloc(%d);", $6, $4 + 1);printf("scanf(\"%%s\", %s\b);", $6);}
-| READ INTEGER_VAR INTO VARIABLE_NAME_CHECK FINALIZER {printf("scanf(\"%%d\", &%s\b);", $4);}
+| READ STRING_VAR MAXLENGTH INTEGER INTO_SP VARIABLE_NAME_CHECK FINALIZER {
+strcpy(aux,$6); aux[strlen($6)-1] = 0;
+printf("%s=malloc(%d);", aux, $4 + 1);
+printf("scanf(\"%%s\", %s);", aux);
+}
+| READ INTEGER_VAR INTO VARIABLE_NAME_CHECK FINALIZER {
+strcpy(aux,$4); aux[strlen($4)-1] = 0;
+printf("scanf(\"%%d\", &%s);", aux);}
 | ADD STRING TOSTRINGLIST VARIABLE_NAME_CHECKTEXTLIST FINALIZER{
-	strcpy(aux, $2);
-	tok = strtok(aux, " ");
-	printf("llist_add_inorder(%s, %s\b, \"\");", tok, $4);
+	strcpy(auxtok, $2);
+	tok = strtok(auxtok, " ");
+	strcpy(aux, $4);
+	aux[strlen($4)-1] = 0;
+	printf("llist_add_inorder(%s, %s, \"\");", tok, aux);
 }
 | ADD VARIABLE_NAME_CHECK TOSTRINGLIST VARIABLE_NAME_CHECKTEXTLIST FINALIZER{
-	strcpy(aux, $2);
-	tok = strtok(aux, " ");
-	printf("llist_add_inorder(%s, %s\b, \"\");", tok, $4);
+	strcpy(auxtok, $2);
+	tok = strtok(auxtok, " ");
+	strcpy(aux, $4);
+	aux[strlen($4)-1] = 0;
+	printf("llist_add_inorder(%s, %s, \"\");", tok, aux);
 }
 | REMOVE STRING FROMSTRINGLIST VARIABLE_NAME_CHECKTEXTLIST FINALIZER{
-	strcpy(aux, $2);
-	tok = strtok(aux, " ");
-	printf("llist_remove(%s, %s\b);", tok, $4);
+	strcpy(auxtok, $2);
+	tok = strtok(auxtok, " ");
+	strcpy(aux, $4);
+	aux[strlen($4)-1] = 0;
+	printf("llist_remove(%s, %s);", tok, aux);
 }
 | REMOVE VARIABLE_NAME_CHECK FROMSTRINGLIST VARIABLE_NAME_CHECKTEXTLIST FINALIZER{
-	strcpy(aux, $2);
-	tok = strtok(aux, " ");
-	printf("llist_remove(%s, %s\b);", tok, $4);
+	strcpy(auxtok, $2);
+	tok = strtok(auxtok, " ");
+	strcpy(aux, $4);
+	aux[strlen($4)-1] = 0;
+	printf("llist_remove(%s, %s);", tok, aux);
 }
 
 | PRINTTEXTLIST VARIABLE_NAME_CHECKTEXTLIST FINALIZER{
-	printf("llist_print(%s);", $2);
+	strcpy(aux, $2);
+	aux[strlen($2)-1] = 0;
+	printf("llist_print(%s);", aux);
+}
+| PRINTNUMBERLIST VARIABLE_NAME_CHECKNUMBERLIST FINALIZER{
+	strcpy(aux, $2);
+	aux[strlen($2)-1] = 0;
+	printf("intllist_print(%s);", aux);
 }
 | ADD INTEGER TONUMBERLIST VARIABLE_NAME_CHECKNUMBERLIST FINALIZER{
-	
-	printf("intllist_add_inorder(%d, %s\b);", $2, $4);
+	strcpy(aux, $4);
+	aux[strlen($4)-1]=0;
+	printf("intllist_add_inorder(%d, %s);", $2, aux);
 }
 | ADD VARIABLE_NAME_CHECK TONUMBERLIST VARIABLE_NAME_CHECKNUMBERLIST FINALIZER{
-	strcpy(aux, $2);
-	tok = strtok(aux, " ");
-	printf("intllist_add_inorder(%s, %s\b);", tok, $4);
+	strcpy(auxtok, $2);
+	tok = strtok(auxtok, " ");
+	strcpy(aux, $4);
+	aux[strlen($4)-1] = 0;
+	printf("intllist_add_inorder(%s, %s);", tok, aux);
 }
 | REMOVE INTEGER FROMNUMBERLIST VARIABLE_NAME_CHECKNUMBERLIST FINALIZER{
-	printf("intllist_remove(%d, %s\b);", $2, $4);
+	strcpy(aux, $4);
+	aux[strlen($4)-1]=0;
+	printf("intllist_remove(%d, %s);", $2, aux);
 }
 | REMOVE VARIABLE_NAME_CHECK FROMNUMBERLIST VARIABLE_NAME_CHECKNUMBERLIST FINALIZER{
-	strcpy(aux, $2);
-	tok = strtok(aux, " ");
-	printf("intllist_remove(%s, %s\b);", tok, $4);
+	strcpy(auxtok, $2);
+	tok = strtok(auxtok, " ");
+	strcpy(aux, $4);
+	aux[strlen($4)-1]=0;
+	printf("intllist_remove(%s, %s);", tok, aux);
 }
 
 
@@ -233,7 +261,10 @@ else{
 }
 $$ = $3;
 }
-|CREATE TEXTLIST VARIABLE_NAME_LIST{
+|CREATE TEXTLIST VARIABLE_NAME_LIST STARTON STRING{
+	strcpy(aux, $3);
+	$3 = strtok(aux, " ");
+
 	if(strlen($3) >= MAX_VARLENGTH){
 	fprintf(stderr, "Be careful! Variable name '%s' is way too long!\n", $3);
 	yyerror("Symbol table error");
@@ -250,9 +281,34 @@ else{
 		llist_add_inorder($3, symbol_table, typeaux);
 	}
 }
-printf("=llist_create(NULL)");
+printf("=llist_create(%s)", $5);
+}
+|CREATE TEXTLIST VARIABLE_NAME_LIST STARTON VARIABLE_NAME_CHECK{
+	strcpy(aux, $3);
+	$3 = strtok(aux, " ");
+	if(strlen($3) >= MAX_VARLENGTH){
+	fprintf(stderr, "Be careful! Variable name '%s' is way too long!\n", $3);
+	yyerror("Symbol table error");
+}
+else{
+	if(llist_search(symbol_table, $3, typeout)){
+		yyerror("re-definition of variable");
+		fprintf(stderr, "Be careful! Variable '%s' was already defined\n", $3);
+		system("rm output.c");
+		YYABORT;	
+	}
+	else{
+		strcpy(typeaux, "INTLIST");
+		strcpy(aux, $3);
+		strtok(aux, " ");
+		llist_add_inorder(aux, symbol_table, typeaux);
+	}
+	printf("=llist_create(%s)", $5);
+}
 }
 |CREATE NUMBERLIST VARIABLE_NAME_INTLIST STARTON INTEGER{
+	strcpy(aux, $3);
+	$3 = strtok(aux, " ");
 	if(strlen($3) >= MAX_VARLENGTH){
 	fprintf(stderr, "Be careful! Variable name '%s' is way too long!\n", $3);
 	yyerror("Symbol table error");
@@ -273,6 +329,8 @@ else{
 	printf("=intllist_create(%d)", $5);
 }
 }|CREATE NUMBERLIST VARIABLE_NAME_INTLIST STARTON VARIABLE_NAME_CHECK{
+	strcpy(aux, $3);
+	$3 = strtok(aux, " ");
 	if(strlen($3) >= MAX_VARLENGTH){
 	fprintf(stderr, "Be careful! Variable name '%s' is way too long!\n", $3);
 	yyerror("Symbol table error");
@@ -325,11 +383,11 @@ ENDIF_STATEMENT: ENDIF { printf("}"); };
 
 ELSE_STATEMENT: ELSE {printf("}else{");};  
 
-DOWHILE: REPEAT_ST STATEMENTS UNTIL_ST BOOLEXP ENDWHILE;
+DOWHILE: REPEAT_ST STATEMENTS WHILE_ST BOOLEXP ENDWHILE;
 
 REPEAT_ST: REPEAT {printf("do{");};
 
-UNTIL_ST: UNTIL {printf("}while(");};
+WHILE_ST: WHILE {printf("}while(");};
 
 ENDWHILE: FINALIZER {printf(");");};
 

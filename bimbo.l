@@ -15,6 +15,7 @@ ASSIGNMENT " IS "
 PRINTNUM "PRINT NUMBER: "
 PRINTSTRING "PRINT TEXT: "
 PRINTTEXTLIST "PRINT TEXT LIST: "
+PRINTNUMBERLIST "PRINT NUMBER LIST: "
 END "."
 PLUS " PLUS "
 MINUS " MINUS "
@@ -38,7 +39,7 @@ NUMBERLIST "NUMBER LIST "
 ELSE "ELSE:"
 ENDIF "END IF"
 REPEAT "REPEAT:"
-UNTIL "UNTIL "
+WHILE "WHILE "
 READ "READ "
 INTO "INTO: "
 INTO_SP " INTO: "
@@ -56,8 +57,9 @@ SPACE " "
 {BIMBO} return BIMBO; //program start
 {END} return END;
 
-[ \t] ECHO; //ignore whitespaces
 [\n] {ECHO; yylineno++;};
+[\t] ECHO; //ignore whitespaces
+
 
 {FINALIZER} return FINALIZER;
 {TEXTLIST} return TEXTLIST;	//list of text
@@ -74,6 +76,7 @@ SPACE " "
 {PRINTTEXTLIST} return PRINTTEXTLIST;
 {TONUMBERLIST} return TONUMBERLIST;
 {FROMNUMBERLIST} return FROMNUMBERLIST;
+{PRINTNUMBERLIST} return PRINTNUMBERLIST;
 {REMOVE} return REMOVE;
 
 {VARIABLE_NAME} {yylval.string = yytext; return VARIABLE_NAME;}	//name of variable in creation
@@ -111,7 +114,7 @@ SPACE " "
 {ENDIF} return ENDIF;
 
 {REPEAT} return REPEAT;	//do while
-{UNTIL} return UNTIL;
+{WHILE} return WHILE;
 
 . ECHO; 
 %%

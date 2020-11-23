@@ -1,0 +1,25 @@
+BIMBO:
+	
+	CREATE TEXT toAdd,
+
+	PRINT TEXT: "Let's make a shopping list!\n",
+	PRINT TEXT: "I will add \"tomato\" to our list!\n",
+	CREATE TEXT LIST mylist STARTING ON "tomato",
+
+	PRINT TEXT: "Here's our shopping list up to now:\nSHOPPING LIST\n------------------------\n",
+	PRINT TEXT LIST: mylist,
+
+	PRINT TEXT: "\nType another item to add: \n",
+	READ TEXT OF MAX LENGTH 20 INTO: toAdd,
+
+	PRINT TEXT: "Let's add it to our list!\n",
+	ADD toAdd TO TEXT LIST mylist,
+	PRINT TEXT: "SHOPPING LIST\n------------------------\n",
+	PRINT TEXT LIST: mylist,
+
+	PRINT TEXT: "\nI don't want tomato anymore! I'll remove it from the list.\n",
+	REMOVE "tomato" FROM TEXT LIST mylist,
+
+	PRINT TEXT: "SHOPPING LIST\n------------------------\n",
+	PRINT TEXT LIST: mylist,
+.
