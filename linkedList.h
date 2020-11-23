@@ -1,6 +1,8 @@
 struct node {
     char data[30];
     struct node *next;
+    char type[10];
+    char value[50];
 };
 
 typedef struct node * llist;
@@ -12,6 +14,8 @@ llist *llist_create(char * name);
 void llist_free(llist *list);
 
 /* llist_add_inorder: Add to sorted linked list */
-int llist_add_inorder(char * name, llist *list);
+int llist_add_inorder(char * name, llist *list, char * type;);
 
-int llist_search(llist *list, char * name);
+int llist_search(llist *list, char * name, char * auxtype);
+
+int llist_print(llist *list);

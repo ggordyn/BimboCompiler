@@ -10,6 +10,8 @@ int yylex();	//avoiding warnings
 void yyerror(const char *s);
 int yydebug = 1;
 llist * symbol_table;
+char typeaux[10];
+char typeout[10];
 %}
 
 %union{
@@ -61,6 +63,7 @@ llist * symbol_table;
 %type<string> VARIABLE_NAME_S
 %type<string> VARIABLE_NAME_F
 %type<string> VARIABLE_NAME_CHECK
+%type<string> DATATYPE
 %type<string> DECLARATION
 %start START;
 
@@ -74,7 +77,7 @@ FINISH: END {printf("}");};
 
 STATEMENTS: INSTRUCTION STATEMENTS | CONTROL STATEMENTS | {};
 
-INSTRUCTION: DECLARATION FINALIZER_S 
+INSTRUCTION: DECLARATION FINALIZER_S
 | DECLARATION ASSIGN_STRING FINALIZER_S
 | DECLARATION ASSIGN_NUM FINALIZER_S
 | VARIABLE_NAME_F ASSIGN_STRING FINALIZER_S
@@ -82,12 +85,12 @@ INSTRUCTION: DECLARATION FINALIZER_S
 | PRINT_NUM_ST FINALIZER_S
 | PRINT_STRING_ST FINALIZER_S
 | READ STRING_VAR MAXLENGTH INTEGER INTO_SP VARIABLE_NAME_CHECK FINALIZER {printf("%s\b = malloc(%d);", $6, $4 + 1);printf("scanf(\"%%s\", %s\b);", $6);}
-| READ INTEGER_VAR INTO VARIABLE_NAME_CHECK FINALIZER {printf("scanf(\"%%s\", &%s\b);", $4);}
+| READ INTEGER_VAR INTO VARIABLE_NAME_CHECK FINALIZER {printf("scanf(\"%%d\", &%s\b);", $4);}
 
 
 VARIABLE_NAME_CHECK: VARIABLE_NAME {
 	int found = 0;
-	if(llist_search(symbol_table, $1)){
+	if(llist_search(symbol_table, $1, typeout)){
 		found = 1;
 	}
 	if(!found){
@@ -100,11 +103,12 @@ VARIABLE_NAME_CHECK: VARIABLE_NAME {
 };
 VARIABLE_NAME_F: VARIABLE_NAME {
 	int found = 0;
-	if(llist_search(symbol_table, $1)){
+	if(llist_search(symbol_table, $1, typeout)){
 		found = 1;
 	}
-	if(found)
+	if(found){
 		printf("%s", $1);
+	}	
 	else{
 		yyerror("undefined variable");
 		fprintf(stderr, "Be careful! Variable '%s' does not exist!\n", $1);
@@ -116,22 +120,23 @@ VARIABLE_NAME_F: VARIABLE_NAME {
 
 
 DECLARATION: CREATE DATATYPE VARIABLE_NAME_S {
-
 if(strlen($3) >= MAX_VARLENGTH){
 	fprintf(stderr, "Be careful! Variable name '%s' is way too long!\n", $3);
 	yyerror("Symbol table error");
 }
 else{
-	if(llist_search(symbol_table, $3)){
+	if(llist_search(symbol_table, $3, typeout)){
 		yyerror("re-definition of variable");
 		fprintf(stderr, "Be careful! Variable '%s' was already defined\n", $3);
 		system("rm output.c");
 		YYABORT;	
 	}
-	else
-		llist_add_inorder($3, symbol_table);
+	else{
+		strcpy(typeaux, $2);
+		llist_add_inorder($3, symbol_table, typeaux);
+	}
 }
-
+$$ = $3;
 };
 
 ASSIGN_STRING: ASSIGNMENT_ST STRING_ST;
@@ -142,8 +147,8 @@ ASSIGNMENT_ST: ASSIGNMENT{printf("=");};
 
 FINALIZER_S: FINALIZER {printf(";");};
 
-DATATYPE: STRING_VAR {printf("char *");}
-| INTEGER_VAR {printf("int ");};
+DATATYPE: STRING_VAR {$$ = "TEXT"; printf("char *");}
+| INTEGER_VAR {$$ = "NUMBER"; printf("int ");};
 
 
 CONTROL: IFBLOCK | DOWHILE; 
